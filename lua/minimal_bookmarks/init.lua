@@ -65,6 +65,7 @@ local function add_current_line_to_bookmarks()
         "Enter a name for the bookmark: ",
         function(name)
             if name == nil then
+                vim.cmd([[redraw]])
                 vim.api.nvim_err_writeln("No bookmark name provided.")
                 return
             end
@@ -73,6 +74,7 @@ local function add_current_line_to_bookmarks()
             name = name:gsub("^%s*(.-)%s*$", "%1")
 
             if not name or name == '' then
+                vim.cmd([[redraw]])
                 vim.api.nvim_err_writeln("No bookmark name provided.")
                 return
             end
@@ -87,6 +89,9 @@ local function add_current_line_to_bookmarks()
             end
             file:write(item)
             file:close()
+
+            vim.cmd([[redraw]])
+            vim.api.nvim_echo({{ "Bookmark added: " .. name, "Normal" }}, true, {})
         end
     )
 end
@@ -259,4 +264,3 @@ vim.cmd('command! MinimalBookmarksEdit lua require "minimal_bookmarks".edit_book
 vim.cmd('command! MinimalBookmarksAdd lua require "minimal_bookmarks".add_bookmark()')
 
 return minimal_bookmarks
-
