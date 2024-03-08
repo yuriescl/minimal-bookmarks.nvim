@@ -4,6 +4,7 @@ A minimal bookmarks plugin for Neovim.
 
 - Bookmark current line
 - Edit bookmarks as a file
+    - Bookmarks are stored in a single file located at ` ~/.cache/nvim/minimal_bookmarks/database`
 - Toggle bookmarks window
 
 ### Installation
@@ -59,6 +60,21 @@ _Lua_:
 vim.api.nvim_set_keymap('n', '<leader>bb', ':MinimalBookmarksToggle<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>be', ':MinimalBookmarksEdit<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>ba', ':MinimalBookmarksAdd<CR>', { noremap = true, silent = true })
+```
+
+### How to edit bookmarks
+
+Run `:MinimalBookmarksEdit` to open the bookmarks file.  
+The file is located at `~/.cache/nvim/minimal_bookmarks/database`.  
+
+You can freely edit the file, but be careful not to break the format. The format is simple: each line is a bookmark, and each line has the format:
+```
+{line_number}|{name}|{file_path}|{a part of the original line content}
+```
+
+Example of a bookmark entry in the file:
+```
+13|location1|/home/yuri/.config/nvim/init.lua|vim.cmd([[
 ```
 
 ### Screenshots
