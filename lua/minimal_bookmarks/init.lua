@@ -34,7 +34,7 @@ local function read_or_create_bookmarks_file(filename)
 
     local content = {}
     for line in file:lines() do
-        local lnum, name, filepath, text = line:match('(%d+)|([^|]+)|([^|]+)|(.+)')
+        local lnum, name, filepath, text = line:match('(%d+)|([^|]+)|([^|]+)|(.*)')
 
         if lnum and name and filepath and text then
             table.insert(content, {name = name, filepath = filepath, lnum = tonumber(lnum), text = text})
@@ -61,7 +61,7 @@ local function prompt_input(prompt, callback)
 end
 
 local function add_current_line_to_bookmarks()
-    local name = prompt_input(
+    prompt_input(
         "Enter a name for the bookmark: ",
         function(name)
             if name == nil then
@@ -91,10 +91,26 @@ local function add_current_line_to_bookmarks()
     )
 end
 
+local function is_buffer_file()
+    local bufnr = vim.fn.bufnr('%')
+    local file_path = vim.fn.expand("%:p")
+
+    -- Check if buffer exists and if the file is readable
+    if bufnr ~= -1 and file_path ~= '' then
+        return true
+    else
+        return false
+    end
+end
+
 function minimal_bookmarks.add_bookmark()
     local current_window = vim.api.nvim_get_current_win()
     if current_window == minimal_bookmarks.win_id then
         vim.api.nvim_err_writeln("Cannot add bookmark from the bookmarks window.")
+        return
+    end
+    if not is_buffer_file() then
+        vim.api.nvim_err_writeln("Cannot add bookmark from a non-file buffer.")
         return
     end
     add_current_line_to_bookmarks()
@@ -127,7 +143,7 @@ function minimal_bookmarks.show_bookmarks()
     end
 
     if #content == 0 then
-        vim.api.nvim_err_writeln("No bookmarks in database.")
+        vim.api.nvim_err_writeln("No bookmarks in database. Use :MinimalBookmarksAdd to bookmark a line.")
         return
     end
 
@@ -149,7 +165,7 @@ function minimal_bookmarks.show_bookmarks()
         if #item.name < highest_length then
             item.name = item.name .. string.rep(" ", highest_length - #item.name)
         end
-        vim.api.nvim_buf_set_lines(buf, i-1, i-1, true, {item.name .. "  " .. basename(item.filepath) .. ":" .. item.lnum .. "  " .. item.text})
+        vim.api.nvim_buf_set_lines(buf, i-1, -1, true, {item.name .. "  " .. basename(item.filepath) .. ":" .. item.lnum .. "  " .. item.text})
     end
 
     local width = math.floor((vim.o.columns) * 0.8)
