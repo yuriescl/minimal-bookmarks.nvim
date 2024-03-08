@@ -35,11 +35,11 @@ For installation instructions using other plugin managers (e.g. [packer.nvim](ht
 #### Commands
 
 Available commands:
+- `:MinimalBookmarksToggle`: Toggle bookmarks window
+- `:MinimalBookmarksAdd`: Add current line to bookmarks
+- `:MinimalBookmarksEdit`: Edit bookmarks file (this is the only way to edit bookmarks)
 - `:MinimalBookmarksShow`: Show bookmarks window
 - `:MinimalBookmarksHide`: Hide bookmarks window
-- `:MinimalBookmarksToggle`: Toggle bookmarks window
-- `:MinimalBookmarksEdit`: Edit bookmarks file (this is the only way to edit bookmarks)
-- `:MinimalBookmarksAdd`: Add current line to bookmarks
 
 #### Keybindings
 
