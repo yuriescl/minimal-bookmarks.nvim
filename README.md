@@ -43,7 +43,7 @@ Available commands:
 
 #### Keybindings
 
-By default, there are no keybindings. You can set your own keybindings in your `init.vim` or `init.lua` file.
+By default, this plugin does not create keybindings. You can set your own keybindings in your `init.vim` or `init.lua` file.
 
 Examples:
 
