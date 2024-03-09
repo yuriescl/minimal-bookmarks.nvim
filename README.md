@@ -1,6 +1,7 @@
-A minimal bookmarks plugin for Neovim.
+**A minimal bookmarks plugin for Neovim.**
 
 <img src="https://github.com/yuriescl/minimal-bookmarks.nvim/assets/26092447/182bceb7-2fb3-4045-99c9-614bd7716e76" />
+
 
 - [Features](#features)
 - [Installation](#installation)
