@@ -1,5 +1,13 @@
 A minimal bookmarks plugin for Neovim.
 
+- [Features](#features)
+- [Installation](#installation)
+- [Commands](#commands)
+- [Keybindings](#keybindings)
+- [How to edit bookmarks](#how-to-edit-bookmarks)
+- [Screenshots](#screenshots)
+- [FAQ](#faq)
+
 ### Features
 
 - Bookmark current line
