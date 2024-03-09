@@ -136,6 +136,11 @@ function minimal_bookmarks.toggle_bookmarks()
 end
 
 function minimal_bookmarks.show_bookmarks()
+    -- Check if the bookmarks window is already open
+    if minimal_bookmarks.win_id then
+        return
+    end
+
     local content, err = read_or_create_bookmarks_file(db_path)
     if err then
         vim.api.nvim_err_writeln(err)
