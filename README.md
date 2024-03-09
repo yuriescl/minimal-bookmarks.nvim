@@ -10,6 +10,7 @@ A minimal bookmarks plugin for Neovim.
 
 ### Features
 
+- Written in Lua as a very small file (~260 lines) with no dependencies
 - Bookmark current line
 - Edit bookmarks as a file
     - Bookmarks are stored in a single file located at ` ~/.cache/nvim/minimal_bookmarks/database`
