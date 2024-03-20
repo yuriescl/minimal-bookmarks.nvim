@@ -227,6 +227,7 @@ function minimal_bookmarks.show_bookmarks()
     end
 
     -- Key mappings for closing the floating window
+    vim.api.nvim_buf_set_keymap(buf, 'n', 'q', ':lua require "minimal_bookmarks".close_bookmarks()<CR>', {noremap = true, silent = true})
     vim.api.nvim_buf_set_keymap(buf, 'n', '<Esc>', ':lua require "minimal_bookmarks".close_bookmarks()<CR>', {noremap = true, silent = true})
     vim.api.nvim_buf_set_keymap(buf, 'n', '<C-c>', ':lua require "minimal_bookmarks".close_bookmarks()<CR>', {noremap = true, silent = true})
 
