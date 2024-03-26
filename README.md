@@ -13,7 +13,7 @@
 
 ### Features
 
-- Written in Lua as a very small file (~260 lines) with no dependencies
+- Written in Lua as a very small file (~345 lines) with no dependencies
 - Bookmark current line
 - Edit bookmarks as a file
     - Bookmarks are stored in a single file located at ` ~/.cache/nvim/minimal_bookmarks/database`
@@ -49,7 +49,12 @@ For installation instructions using other plugin managers (e.g. [packer.nvim](ht
 
 Available commands:
 - `:MinimalBookmarksToggle`: Toggle bookmarks window
-- `:MinimalBookmarksAdd`: Add current line to bookmarks
+- `:MinimalBookmarksAdd`: Add current line to end of bookmarks
+    - If no argument is provided to this command, it will prompt for the bookmark name
+    - A bookmark name can be provided as an argument, e.g. `:MinimalBookmarksAdd location1`
+- `:MinimalBookmarksInsert`: Insert current line into beginning of bookmarks
+    - If no argument is provided to this command, it will prompt for the bookmark name
+    - A bookmark name can be provided as an argument, e.g. `:MinimalBookmarksInsert location1`
 - `:MinimalBookmarksEdit`: Edit bookmarks file (this is the only way to edit bookmarks)
 - `:MinimalBookmarksShow`: Show bookmarks window
 - `:MinimalBookmarksHide`: Hide bookmarks window
@@ -65,6 +70,7 @@ _Vimscript_:
 nnoremap <silent> <leader>bb :MinimalBookmarksToggle<CR>
 nnoremap <silent> <leader>be :MinimalBookmarksEdit<CR>
 nnoremap <silent> <leader>ba :MinimalBookmarksAdd<CR>
+nnoremap <silent> <leader>bi :MinimalBookmarksInsert<CR>
 ```
 
 _Lua_:
@@ -72,6 +78,7 @@ _Lua_:
 vim.api.nvim_set_keymap('n', '<leader>bb', ':MinimalBookmarksToggle<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>be', ':MinimalBookmarksEdit<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>ba', ':MinimalBookmarksAdd<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>bi', ':MinimalBookmarksInsert<CR>', { noremap = true, silent = true })
 ```
 
 ### How to edit bookmarks

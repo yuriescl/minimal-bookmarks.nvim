@@ -60,40 +60,81 @@ local function prompt_input(prompt, callback)
     vim.ui.input({ prompt = prompt}, callback)
 end
 
-local function add_current_line_to_bookmarks()
-    prompt_input(
-        "Enter a name for the bookmark: ",
-        function(name)
-            if name == nil then
-                vim.cmd([[redraw]])
-                vim.api.nvim_err_writeln("No bookmark name provided.")
-                return
-            end
+local function apppend_line_to_end_of_file(file_path, line)
+    local file = io.open(file_path, "a")
+    if not file then
+        error("Error opening file: " .. file_path)
+    end
+    file:write(line .. '\n')
+    file:close()
+end
 
-            -- Trim newlines and spaces from the input
-            name = name:gsub("^%s*(.-)%s*$", "%1")
+local function insert_line_at_beginning_of_file(file_path, line)
+    local content = ""
+    local file = io.open(file_path, "r")
+    if file then
+        content = file:read("*a")
+        file:close()
+    end
 
-            if not name or name == '' then
-                vim.cmd([[redraw]])
-                vim.api.nvim_err_writeln("No bookmark name provided.")
-                return
-            end
-            local current_line = vim.api.nvim_win_get_cursor(0)[1]
-            local file_path = vim.fn.expand("%:p")
-            local text = get_current_line_trimmed()
-            local item = current_line .. '|' .. name .. '|' .. file_path .. '|' .. text .. '\n'
-            local file = io.open(db_path, "a")
-            if not file then
-                vim.api.nvim_err_writeln("Error opening file: " .. db_path)
-                return
-            end
-            file:write(item)
-            file:close()
+    local new_file = io.open(file_path, "w")
+    if not new_file then
+        error("Error opening file: " .. file_path)
+    end
+    new_file:write(line .. '\n' .. content)
+    new_file:close()
+end
 
-            vim.cmd([[redraw]])
-            vim.api.nvim_echo({{ "Bookmark added: " .. name, "Normal" }}, true, {})
-        end
-    )
+local function _add_current_line_to_bookmarks(append, name)
+    if name == nil then
+        vim.cmd([[redraw]])
+        vim.api.nvim_err_writeln("No bookmark name provided.")
+        return
+    end
+
+    -- Trim newlines and spaces from the input
+    name = name:gsub("^%s*(.-)%s*$", "%1")
+
+    if not name or name == '' then
+        vim.cmd([[redraw]])
+        vim.api.nvim_err_writeln("No bookmark name provided.")
+        return
+    end
+    local current_line = vim.api.nvim_win_get_cursor(0)[1]
+    local file_path = vim.fn.expand("%:p")
+    local text = get_current_line_trimmed()
+    local item = current_line .. '|' .. name .. '|' .. file_path .. '|' .. text
+
+    if append then
+        apppend_line_to_end_of_file(db_path, item)
+        vim.cmd([[redraw]])
+        vim.api.nvim_echo({{ "Bookmark added: " .. name, "Normal" }}, true, {})
+    else
+        insert_line_at_beginning_of_file(db_path, item)
+        vim.cmd([[redraw]])
+        vim.api.nvim_echo({{ "Bookmark inserted: " .. name, "Normal" }}, true, {})
+    end
+end
+
+local function add_current_line_to_bookmarks(append, bookmark_name)
+    if bookmark_name then
+        return _add_current_line_to_bookmarks(append, bookmark_name)
+    else
+        prompt_input(
+            "Enter a name for the bookmark: ",
+            function(name)
+                return _add_current_line_to_bookmarks(append, name)
+            end
+        )
+    end
+end
+
+local function add_current_line_to_end_of_bookmarks()
+    add_current_line_to_bookmarks(true)
+end
+
+local function add_current_line_to_start_of_bookmarks()
+    add_current_line_to_bookmarks(false)
 end
 
 local function is_buffer_file()
@@ -108,7 +149,7 @@ local function is_buffer_file()
     end
 end
 
-function minimal_bookmarks.add_bookmark()
+local function add_bookmark(append, name)
     local current_window = vim.api.nvim_get_current_win()
     if current_window == minimal_bookmarks.win_id then
         vim.api.nvim_err_writeln("Cannot add bookmark from the bookmarks window.")
@@ -118,7 +159,37 @@ function minimal_bookmarks.add_bookmark()
         vim.api.nvim_err_writeln("Cannot add bookmark from a non-file buffer.")
         return
     end
-    add_current_line_to_bookmarks()
+    add_current_line_to_bookmarks(append, name)
+end
+
+function minimal_bookmarks.add_bookmark(fargs)
+    if not fargs then
+        add_bookmark(true, nil)
+        return
+    else
+        local args = vim.split(fargs, " ", {trimempty = true})
+        if #args > 1 then
+            vim.api.nvim_err_writeln("Too many arguments provided.")
+            return
+        end
+        local name = args[1]
+        add_bookmark(true, name)
+    end
+end
+
+function minimal_bookmarks.insert_bookmark(fargs)
+    if not fargs then
+        add_bookmark(false, nil)
+        return
+    else
+        local args = vim.split(fargs, " ", {trimempty = true})
+        if #args > 1 then
+            vim.api.nvim_err_writeln("Too many arguments provided.")
+            return
+        end
+        local name = args[1]
+        add_bookmark(false, name)
+    end
 end
 
 function minimal_bookmarks.hide_bookmarks()
@@ -267,6 +338,7 @@ vim.cmd('command! MinimalBookmarksShow lua require "minimal_bookmarks".show_book
 vim.cmd('command! MinimalBookmarksHide lua require "minimal_bookmarks".hide_bookmarks()')
 vim.cmd('command! MinimalBookmarksToggle lua require "minimal_bookmarks".toggle_bookmarks()')
 vim.cmd('command! MinimalBookmarksEdit lua require "minimal_bookmarks".edit_bookmarks()')
-vim.cmd('command! MinimalBookmarksAdd lua require "minimal_bookmarks".add_bookmark()')
+vim.cmd('command! -nargs=? MinimalBookmarksAdd lua require "minimal_bookmarks".add_bookmark(<f-args>)')
+vim.cmd('command! -nargs=? MinimalBookmarksInsert lua require "minimal_bookmarks".insert_bookmark(<f-args>)')
 
 return minimal_bookmarks
