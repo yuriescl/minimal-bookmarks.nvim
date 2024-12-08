@@ -162,6 +162,91 @@ local function add_bookmark(append, name)
     add_current_line_to_bookmarks(append, name)
 end
 
+
+local function is_current_line_bookmarked()
+    local current_line = vim.api.nvim_win_get_cursor(0)[1]
+    local file_path = vim.fn.expand("%:p")
+    
+    local file = io.open(db_path, "r")
+    if not file then
+        return false
+    end
+    
+    for line in file:lines() do
+        local lnum, _, filepath, _ = line:match('(%d+)|([^|]+)|([^|]+)|(.*)')
+        if lnum and filepath then
+            if tonumber(lnum) == current_line and filepath == file_path then
+                file:close()
+                return true
+            end
+        end
+    end
+    
+    file:close()
+    return false
+end
+
+local function delete_current_line_bookmark()
+    if not is_buffer_file() then
+        vim.api.nvim_err_writeln("Cannot delete bookmark from a non-file buffer.")
+        return
+    end
+
+    local current_line = vim.api.nvim_win_get_cursor(0)[1]
+    local file_path = vim.fn.expand("%:p")
+    
+    -- Read all bookmarks
+    local file = io.open(db_path, "r")
+    if not file then
+        vim.api.nvim_err_writeln("No bookmarks database found.")
+        return
+    end
+    
+    local lines = {}
+    local found = false
+    
+    for line in file:lines() do
+        local lnum, name, filepath, _ = line:match('(%d+)|([^|]+)|([^|]+)|(.*)')
+        if lnum and filepath then
+            if tonumber(lnum) ~= current_line or filepath ~= file_path then
+                table.insert(lines, line)
+            else
+                found = name
+            end
+        end
+    end
+    
+    file:close()
+    
+    if not found then
+        vim.api.nvim_err_writeln("No bookmark found for current line.")
+        return
+    end
+    
+    -- Write back all lines except the deleted one
+    file = io.open(db_path, "w")
+    if not file then
+        vim.api.nvim_err_writeln("Error opening bookmarks database for writing.")
+        return
+    end
+    
+    for _, line in ipairs(lines) do
+        file:write(line .. '\n')
+    end
+    
+    file:close()
+    vim.api.nvim_echo({{ "Bookmark deleted: " .. found, "Normal" }}, true, {})
+end
+
+function minimal_bookmarks.delete_bookmark()
+    local current_window = vim.api.nvim_get_current_win()
+    if current_window == minimal_bookmarks.win_id then
+        vim.api.nvim_err_writeln("Cannot delete bookmark from the bookmarks window.")
+        return
+    end
+    delete_current_line_bookmark()
+end
+
 function minimal_bookmarks.add_bookmark(fargs)
     if not fargs then
         add_bookmark(true, nil)
@@ -340,5 +425,6 @@ vim.cmd('command! MinimalBookmarksToggle lua require "minimal_bookmarks".toggle_
 vim.cmd('command! MinimalBookmarksEdit lua require "minimal_bookmarks".edit_bookmarks()')
 vim.cmd('command! -nargs=? MinimalBookmarksAdd lua require "minimal_bookmarks".add_bookmark(<f-args>)')
 vim.cmd('command! -nargs=? MinimalBookmarksInsert lua require "minimal_bookmarks".insert_bookmark(<f-args>)')
+vim.cmd('command! MinimalBookmarksDelete lua require "minimal_bookmarks".delete_bookmark()')
 
 return minimal_bookmarks
