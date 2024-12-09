@@ -162,30 +162,6 @@ local function add_bookmark(append, name)
     add_current_line_to_bookmarks(append, name)
 end
 
-
-local function is_current_line_bookmarked()
-    local current_line = vim.api.nvim_win_get_cursor(0)[1]
-    local file_path = vim.fn.expand("%:p")
-    
-    local file = io.open(db_path, "r")
-    if not file then
-        return false
-    end
-    
-    for line in file:lines() do
-        local lnum, _, filepath, _ = line:match('(%d+)|([^|]+)|([^|]+)|(.*)')
-        if lnum and filepath then
-            if tonumber(lnum) == current_line and filepath == file_path then
-                file:close()
-                return true
-            end
-        end
-    end
-    
-    file:close()
-    return false
-end
-
 local function delete_current_line_bookmark()
     if not is_buffer_file() then
         vim.api.nvim_err_writeln("Cannot delete bookmark from a non-file buffer.")
