@@ -58,6 +58,7 @@ Available commands:
 - `:MinimalBookmarksEdit`: Edit bookmarks file (this is the only way to edit bookmarks)
 - `:MinimalBookmarksShow`: Show bookmarks window
 - `:MinimalBookmarksHide`: Hide bookmarks window
+- `:MinimalBookmarksDelete`: Delete current line from bookmarks
 
 #### Keybindings
 
@@ -71,6 +72,7 @@ nnoremap <silent> <leader>bb :MinimalBookmarksToggle<CR>
 nnoremap <silent> <leader>be :MinimalBookmarksEdit<CR>
 nnoremap <silent> <leader>ba :MinimalBookmarksAdd<CR>
 nnoremap <silent> <leader>bi :MinimalBookmarksInsert<CR>
+nnoremap <silent> <leader>bd :MinimalBookmarksDelete<CR>
 ```
 
 _Lua_:
@@ -79,6 +81,7 @@ vim.api.nvim_set_keymap('n', '<leader>bb', ':MinimalBookmarksToggle<CR>', { nore
 vim.api.nvim_set_keymap('n', '<leader>be', ':MinimalBookmarksEdit<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>ba', ':MinimalBookmarksAdd<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>bi', ':MinimalBookmarksInsert<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>bd', ':MinimalBookmarksDelete<CR>', { noremap = true, silent = true })
 ```
 
 ### How to edit bookmarks
